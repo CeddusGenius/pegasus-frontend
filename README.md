@@ -1,7 +1,7 @@
 
 > **⚠️ Fork non officiel — Projet ArcadeBox 15kHz**
 >
-> Ce dépôt est un fork de [mmatyas/pegasus-frontend](https://github.com/mmatyas/pegasus-frontend) maintenu par **CeddusGenius** dans le cadre du projet **[ArcadeBox 15kHz](https://github.com/CeddusGenius/ArcadeBox)**.
+> Ce dépôt est un fork de [mmatyas/pegasus-frontend](https://github.com/mmatyas/pegasus-frontend) maintenu par **CeddusGenius** dans le cadre du projet **[ArcadeBox](https://github.com/CeddusGenius/ArcadeBox)**.
 >
 > **Modifications apportées :**
 > - Compilation Windows x64 basée sur la branche expérimentale **Qt 6 (`qt6_v2`)** avec support manette **SDL2**.
