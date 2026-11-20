@@ -29,7 +29,7 @@
 #include "model/gaming/GameFile.h"
 #endif
 
-namespace model { class Assets; }
+#include "model/gaming/Assets.h"
 namespace model { class GameFile; }
 namespace model { class Collection; }
 
