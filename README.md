@@ -1,3 +1,18 @@
+
+> **⚠️ Fork non officiel — Projet ArcadeBox**
+>
+> Ce dépôt est un fork de [mmatyas/pegasus-frontend](https://github.com/mmatyas/pegasus-frontend) maintenu par **CeddusGenius** dans le cadre du projet **[ArcadeBox](https://github.com/CeddusGenius/ArcadeBox)**.
+>
+> **Modifications apportées :**
+> - Compilation Windows x64 basée sur la branche expérimentale **Qt 6 (`qt6_v2`)** avec support manette **SDL2**.
+> - Correctifs de compilation pour les versions récentes de Qt 6 (`Assets.h` dans `Collection.h` et `Game.h`).
+> - Automatisation des builds Windows via GitHub Actions.
+>
+> Les binaires compilés sont disponibles dans l'onglet **[Releases](../../releases)**. Pour toute demande liée au cœur de Pegasus, merci de vous référer au dépôt officiel.
+
+---
+
+
 ![screenshot](etc/promo/screenshot_alpha10.jpg)
 
 
