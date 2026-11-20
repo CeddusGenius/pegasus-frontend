@@ -1,0 +1,53 @@
+name: Build Windows Qt6
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Qt 6
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+          modules: 'qtmultimedia qtshadertools qtsvg'
+
+      - name: Download SDL2
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com" -OutFile "SDL2.zip"
+          Expand-Archive -Path "SDL2.zip" -DestinationPath "C:\SDL2"
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:\SDL2\SDL2-2.30.11"
+
+      - name: Build Pegasus
+        shell: pwsh
+        run: |
+          cmake --build build --config Release --parallel
+
+      - name: Package Application
+        shell: pwsh
+        run: |
+          mkdir dist
+          Copy-Item "build\src\app\Release\pegasus-fe.exe" -Destination "dist\"
+          Copy-Item "C:\SDL2\SDL2-2.30.11\lib\x64\SDL2.dll" -Destination "dist\"
+          windeployqt.exe --qmldir src\frontend dist\pegasus-fe.exe
+
+      - name: Upload Windows Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: pegasus-fe-win64-qt6
+          path: dist/
