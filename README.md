@@ -1,5 +1,5 @@
 
-> **⚠️ Fork non officiel — Projet ArcadeBox 15kHz**
+> **⚠️ Fork non officiel — Projet ArcadeBox**
 >
 > Ce dépôt est un fork de [mmatyas/pegasus-frontend](https://github.com/mmatyas/pegasus-frontend) maintenu par **CeddusGenius** dans le cadre du projet **[ArcadeBox](https://github.com/CeddusGenius/ArcadeBox)**.
 >
