@@ -26,7 +26,7 @@
 #include "model/gaming/Game.h"
 #endif
 
-namespace model { class Assets; }
+#include "model/gaming/Assets.h"
 namespace model { class Game; }
 
 
