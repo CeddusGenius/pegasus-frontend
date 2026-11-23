@@ -5,7 +5,7 @@
 >
 > **Modifications apportées :**
 > - Compilation Windows x64 basée sur la branche expérimentale **Qt 6 (`qt6_v2`)** avec support manette **SDL2**.
-> - Correctifs de compilation pour les versions récentes de Qt 6 (`Assets.h` dans `Collection.h` et `Game.h`).
+> - Correctifs de compilation pour les versions récentes de Qt 6 (`key.cpp`, `Assets.h` dans `Collection.h` et `Game.h`).
 > - Automatisation des builds Windows via GitHub Actions.
 >
 > Les binaires compilés sont disponibles dans l'onglet **[Releases](../../releases)**. Pour toute demande liée au cœur de Pegasus, merci de vous référer au dépôt officiel.
