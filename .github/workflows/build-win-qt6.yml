@@ -15,12 +15,9 @@ jobs:
 
       - name: Install Qt 6.8.3
         id: install-qt
-        uses: jurplel/install-qt-action@v4
+        uses: trollixx/setup-qt@v1
         with:
           version: '6.8.3'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_msvc2022_64'
           modules: 'qtmultimedia qtshadertools qtsvg'
 
       - name: Download SDL2
@@ -34,7 +31,7 @@ jobs:
       - name: Configure CMake
         shell: pwsh
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ steps.install-qt.outputs.qt-root-dir }};C:\SDL2\SDL2-2.32.10"
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ steps.install-qt.outputs.prefix }};C:\SDL2\SDL2-2.32.10"
 
       - name: Build Pegasus
         shell: pwsh
@@ -52,7 +49,7 @@ jobs:
           Copy-Item "LICENSE.md" -Destination "dist\"
           Copy-Item "README.md" -Destination "dist\"
           New-Item -Path "dist\portable.txt" -ItemType File
-          & "${{ steps.install-qt.outputs.qt-root-dir }}\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
+          & "${{ steps.install-qt.outputs.prefix }}\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v4
