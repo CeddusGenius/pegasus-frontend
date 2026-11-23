@@ -13,6 +13,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Install Qt 6
         uses: jurplel/install-qt-action@v4
         with:
@@ -21,6 +26,7 @@ jobs:
           target: 'desktop'
           arch: 'win64_msvc2022_64'
           modules: 'qtmultimedia qtshadertools qtsvg'
+          aqtversion: '==3.3.*'
 
       - name: Download SDL2
         shell: pwsh
@@ -42,8 +48,13 @@ jobs:
         shell: pwsh
         run: |
           mkdir dist
+          mkdir dist\config
+          mkdir dist\config\themes
           Copy-Item "build\src\app\Release\pegasus-fe.exe" -Destination "dist\"
           Copy-Item "C:\SDL2\SDL2-2.30.11\lib\x64\SDL2.dll" -Destination "dist\"
+          Copy-Item "LICENSE.md" -Destination "dist\"
+          Copy-Item "README.md" -Destination "dist\"
+          New-Item -Path "dist\portable.txt" -ItemType File
           windeployqt.exe --qmldir src\frontend dist\pegasus-fe.exe
 
       - name: Upload Windows Build
