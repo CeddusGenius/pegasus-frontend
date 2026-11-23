@@ -13,35 +13,15 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install latest Qt 6 via aqtinstall
+      - name: Install Qt 6 and SDL2 via vcpkg
         shell: pwsh
         run: |
-          python -m pip install --upgrade pip aqtinstall
-          $qtVersion = (python -m aqt list-qt windows desktop --latest-version).Trim()
-          Write-Host "Version Qt detectee : $qtVersion"
-          $qtArch = (python -m aqt list-qt windows desktop --arch $qtVersion | Select-String "msvc.*_64" | Select-Object -First 1).ToString().Trim()
-          Write-Host "Architecture detectee : $qtArch"
-          python -m aqt install-qt windows desktop $qtVersion $qtArch -m qtmultimedia qtshadertools qtsvg -O C:\Qt
-          $qtDir = Get-ChildItem -Path "C:\Qt\$qtVersion" -Directory | Select-Object -First 1 -ExpandProperty FullName
-          Write-Host "Dossier Qt installe : $qtDir"
-          echo "$qtDir\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "QT_DIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: Download SDL2
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://github.com" -OutFile "SDL2.zip"
-          Expand-Archive -Path "SDL2.zip" -DestinationPath "C:\SDL2"
+          vcpkg install qtbase:x64-windows qtdeclarative:x64-windows qtmultimedia:x64-windows qtshadertools:x64-windows qtsvg:x64-windows sdl2:x64-windows
 
       - name: Configure CMake
         shell: pwsh
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$env:QT_DIR;C:\SDL2\SDL2-2.30.11"
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
 
       - name: Build Pegasus
         shell: pwsh
@@ -55,11 +35,11 @@ jobs:
           mkdir dist\config
           mkdir dist\config\themes
           Copy-Item "build\src\app\Release\pegasus-fe.exe" -Destination "dist\"
-          Copy-Item "C:\SDL2\SDL2-2.30.11\lib\x64\SDL2.dll" -Destination "dist\"
+          Copy-Item "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\bin\*.dll" -Destination "dist\"
           Copy-Item "LICENSE.md" -Destination "dist\"
           Copy-Item "README.md" -Destination "dist\"
           New-Item -Path "dist\portable.txt" -ItemType File
-          & "$env:QT_DIR\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
+          & "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\qt6\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v4
