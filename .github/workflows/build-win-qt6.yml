@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -54,9 +56,22 @@ jobs:
           Copy-Item -Path "src\themes\pegasus-theme-grid" -Destination "dist\config\themes\" -Recurse
           New-Item -Path "dist\portable.txt" -ItemType File
           & "${{ steps.install-qt.outputs.prefix }}\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
+          Compress-Archive -Path "dist\*" -DestinationPath "pegasus-fe-win64-qt6.zip" -Force
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v4
         with:
           name: pegasus-fe-win64-qt6
           path: dist/
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view win64-qt6-latest 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create win64-qt6-latest "pegasus-fe-win64-qt6.zip" --title "Pegasus Frontend Windows x64 (Qt 6)" --notes "Dernière compilation automatique Windows 64-bit (Qt 6.8.3)." --target qt6_v2
+          } else {
+            gh release upload win64-qt6-latest "pegasus-fe-win64-qt6.zip" --clobber
+          }
