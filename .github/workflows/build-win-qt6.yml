@@ -18,13 +18,24 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Qt 6.8.1 via aqtinstall (Direct Mirror)
+      - name: Install Qt 6 via aqtinstall (Direct Mirror)
         shell: pwsh
         run: |
           python -m pip install --upgrade pip aqtinstall
-          python -m aqt install-qt windows desktop 6.8.1 win64_msvc2022_64 -m qtmultimedia qtshadertools qtsvg -b "https://fau.de" -O C:\Qt
-          echo "C:\Qt\6.8.1\msvc2022_64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "QT_DIR=C:\Qt\6.8.1\msvc2022_64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          $mirror = "https://fau.de"
+          $versionsRaw = (python -m aqt list-qt windows desktop -b $mirror) -join " "
+          Write-Host "Versions disponibles : $versionsRaw"
+          $qtVersion = ($versionsRaw -split "\s+" | Where-Object { $_ -match "^6\." } | Select-Object -Last 1).Trim()
+          Write-Host "Version selectionnee : $qtVersion"
+          $archsRaw = (python -m aqt list-qt windows desktop --arch $qtVersion -b $mirror) -join " "
+          Write-Host "Architectures disponibles : $archsRaw"
+          $qtArch = ($archsRaw -split "\s+" | Where-Object { $_ -match "msvc.*_64" } | Select-Object -Last 1).Trim()
+          Write-Host "Architecture selectionnee : $qtArch"
+          python -m aqt install-qt windows desktop $qtVersion $qtArch -m qtmultimedia qtshadertools qtsvg -b $mirror -O C:\Qt
+          $qtDir = Get-ChildItem -Path "C:\Qt\$qtVersion" -Directory | Select-Object -First 1 -ExpandProperty FullName
+          Write-Host "Dossier Qt installe : $qtDir"
+          echo "$qtDir\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "QT_DIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Download SDL2
         shell: pwsh
