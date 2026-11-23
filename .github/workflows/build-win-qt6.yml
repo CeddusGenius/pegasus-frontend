@@ -58,12 +58,6 @@ jobs:
           & "${{ steps.install-qt.outputs.prefix }}\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
           Compress-Archive -Path "dist\*" -DestinationPath "pegasus-fe-win64-qt6.zip" -Force
 
-      - name: Upload Windows Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: pegasus-fe-win64-qt6
-          path: dist/
-
       - name: Publish GitHub Release
         shell: pwsh
         env:
