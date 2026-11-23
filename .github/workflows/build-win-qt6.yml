@@ -18,27 +18,27 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Qt 6.10.3 via patched aqtinstall
-        shell: pwsh
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install git+https://github.com
-          python -m aqt install-qt windows desktop 6.10.3 win64_msvc2022_64 -m qtmultimedia qtshadertools qtsvg -b "https://mirrors.dotsrc.org/qtproject" -O C:\Qt
-          $qtDir = Get-ChildItem -Path "C:\Qt\6.10.3" -Directory | Select-Object -First 1 -ExpandProperty FullName
-          Write-Host "Dossier Qt installe : $qtDir"
-          echo "$qtDir\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "QT_DIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Install Qt 6.8.3
+        id: install-qt
+        uses: jurplel/install-qt-action@master
+        with:
+          version: '6.8.3'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+          modules: 'qtmultimedia qtshadertools qtsvg'
+          setup-python: 'false'
 
       - name: Download SDL2
         shell: pwsh
         run: |
-          Invoke-WebRequest -Uri "https://github.com" -OutFile "SDL2.zip"
+          Invoke-WebRequest -Uri "https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-devel-2.32.10-VC.zip" -OutFile "SDL2.zip"
           Expand-Archive -Path "SDL2.zip" -DestinationPath "C:\SDL2"
 
       - name: Configure CMake
         shell: pwsh
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$env:QT_DIR;C:\SDL2\SDL2-2.30.11"
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ steps.install-qt.outputs.qt-root-dir }};C:\SDL2\SDL2-2.32.10"
 
       - name: Build Pegasus
         shell: pwsh
@@ -52,11 +52,11 @@ jobs:
           mkdir dist\config
           mkdir dist\config\themes
           Copy-Item "build\src\app\Release\pegasus-fe.exe" -Destination "dist\"
-          Copy-Item "C:\SDL2\SDL2-2.30.11\lib\x64\SDL2.dll" -Destination "dist\"
+          Copy-Item "C:\SDL2\SDL2-2.32.10\lib\x64\SDL2.dll" -Destination "dist\"
           Copy-Item "LICENSE.md" -Destination "dist\"
           Copy-Item "README.md" -Destination "dist\"
           New-Item -Path "dist\portable.txt" -ItemType File
-          & "$env:QT_DIR\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
+          & "${{ steps.install-qt.outputs.qt-root-dir }}\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v4
