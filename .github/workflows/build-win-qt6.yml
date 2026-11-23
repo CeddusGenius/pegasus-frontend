@@ -1,6 +1,9 @@
 name: Build Windows Qt6
 
 on:
+  push:
+    branches:
+      - qt6_v2
   workflow_dispatch:
 
 jobs:
@@ -48,6 +51,7 @@ jobs:
           Copy-Item "C:\SDL2\SDL2-2.32.10\lib\x64\SDL2.dll" -Destination "dist\"
           Copy-Item "LICENSE.md" -Destination "dist\"
           Copy-Item "README.md" -Destination "dist\"
+          Copy-Item -Path "src\themes\pegasus-theme-grid" -Destination "dist\config\themes\" -Recurse
           New-Item -Path "dist\portable.txt" -ItemType File
           & "${{ steps.install-qt.outputs.prefix }}\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
 
