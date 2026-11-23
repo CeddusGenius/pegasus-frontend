@@ -18,15 +18,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Qt 6
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '6.8.3'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_msvc2022_64'
-          modules: 'qtmultimedia qtshadertools qtsvg'
-          aqtversion: '==3.3.*'
+      - name: Install Qt 6.8.3 via aqtinstall
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip aqtinstall
+          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -m qtmultimedia qtshadertools qtsvg -O C:\Qt
+          echo "C:\Qt\6.8.3\msvc2022_64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "Qt6_DIR=C:\Qt\6.8.3\msvc2022_64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Download SDL2
         shell: pwsh
@@ -37,7 +35,7 @@ jobs:
       - name: Configure CMake
         shell: pwsh
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:\SDL2\SDL2-2.30.11"
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:\Qt\6.8.3\msvc2022_64;C:\SDL2\SDL2-2.30.11"
 
       - name: Build Pegasus
         shell: pwsh
@@ -55,7 +53,7 @@ jobs:
           Copy-Item "LICENSE.md" -Destination "dist\"
           Copy-Item "README.md" -Destination "dist\"
           New-Item -Path "dist\portable.txt" -ItemType File
-          windeployqt.exe --qmldir src\frontend dist\pegasus-fe.exe
+          C:\Qt\6.8.3\msvc2022_64\bin\windeployqt.exe --qmldir src\frontend dist\pegasus-fe.exe
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v4
