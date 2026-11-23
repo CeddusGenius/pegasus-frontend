@@ -13,27 +13,23 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
       - name: Install Qt 6.8.3
         id: install-qt
-        uses: jurplel/install-qt-action@master
+        uses: jurplel/install-qt-action@v4
         with:
           version: '6.8.3'
           host: 'windows'
           target: 'desktop'
           arch: 'win64_msvc2022_64'
           modules: 'qtmultimedia qtshadertools qtsvg'
-          setup-python: 'false'
 
       - name: Download SDL2
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          Invoke-WebRequest -Uri "https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-devel-2.32.10-VC.zip" -OutFile "SDL2.zip"
-          Expand-Archive -Path "SDL2.zip" -DestinationPath "C:\SDL2"
+          gh release download release-2.32.10 --repo libsdl-org/SDL --pattern "SDL2-devel-2.32.10-VC.zip"
+          Expand-Archive -Path "SDL2-devel-2.32.10-VC.zip" -DestinationPath "C:\SDL2"
 
       - name: Configure CMake
         shell: pwsh
