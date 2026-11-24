@@ -1,1 +1,74 @@
+name: Build Windows Qt5
 
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Qt 5.15.2
+        id: install-qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '5.15.2'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+          modules: 'qtmultimedia qtsvg qtgraphicaleffects qtquickcontrols2'
+
+      - name: Download SDL2
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download release-2.32.10 --repo libsdl-org/SDL --pattern "SDL2-devel-2.32.10-VC.zip"
+          Expand-Archive -Path "SDL2-devel-2.32.10-VC.zip" -DestinationPath "C:\SDL2"
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ env.Qt5_Dir }};C:\SDL2\SDL2-2.32.10"
+
+      - name: Build Pegasus
+        shell: pwsh
+        run: |
+          cmake --build build --config Release --parallel
+
+      - name: Package Application
+        shell: pwsh
+        run: |
+          mkdir dist
+          mkdir dist\config
+          mkdir dist\config\themes
+          Copy-Item "build\src\app\Release\pegasus-fe.exe" -Destination "dist\"
+          Copy-Item "C:\SDL2\SDL2-2.32.10\lib\x64\SDL2.dll" -Destination "dist\"
+          Copy-Item "LICENSE.md" -Destination "dist\"
+          Copy-Item "README.md" -Destination "dist\"
+          Copy-Item -Path "src\themes\pegasus-theme-grid" -Destination "dist\config\themes\" -Recurse
+          New-Item -Path "dist\portable.txt" -ItemType File
+          & "${{ env.Qt5_Dir }}\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
+          Compress-Archive -Path "dist\*" -DestinationPath "pegasus-fe-win64-qt5.zip" -Force
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view win64-qt5-latest 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create win64-qt5-latest "pegasus-fe-win64-qt5.zip" --title "Pegasus Frontend Windows x64 (Qt 5)" --notes "Dernière compilation automatique Windows 64-bit (Qt 5.15.2)." --target master
+          } else {
+            gh release upload win64-qt5-latest "pegasus-fe-win64-qt5.zip" --clobber
+          }
