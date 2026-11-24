@@ -38,7 +38,7 @@ jobs:
       - name: Configure CMake
         shell: pwsh
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ env.Qt5_Dir }};C:\SDL2\SDL2-2.32.10"
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ env.QT_ROOT_DIR }};C:\SDL2\SDL2-2.32.10"
 
       - name: Build Pegasus
         shell: pwsh
@@ -57,7 +57,7 @@ jobs:
           Copy-Item "README.md" -Destination "dist\"
           Copy-Item -Path "src\themes\pegasus-theme-grid" -Destination "dist\config\themes\" -Recurse
           New-Item -Path "dist\portable.txt" -ItemType File
-          & "${{ env.Qt5_Dir }}\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
+          & "${{ env.QT_ROOT_DIR }}\bin\windeployqt.exe" --qmldir src\frontend dist\pegasus-fe.exe
           Compress-Archive -Path "dist\*" -DestinationPath "pegasus-fe-win64-qt5.zip" -Force
 
       - name: Publish GitHub Release
