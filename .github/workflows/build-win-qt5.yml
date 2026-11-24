@@ -26,7 +26,6 @@ jobs:
           host: 'windows'
           target: 'desktop'
           arch: 'win64_msvc2019_64'
-          modules: 'qtmultimedia qtsvg qtgraphicaleffects qtquickcontrols2'
 
       - name: Download SDL2
         shell: pwsh
