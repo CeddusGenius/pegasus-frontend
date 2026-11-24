@@ -1,16 +1,16 @@
-
-> **⚠️ Fork non officiel — Projet ArcadeBox**
+> **⚠️ Fork non officiel — Projet ArcadeBox (Édition CRT 15 kHz)**
 >
-> Ce dépôt est un fork de [mmatyas/pegasus-frontend](https://github.com/mmatyas/pegasus-frontend) maintenu par **CeddusGenius** dans le cadre du projet **[ArcadeBox](https://github.com/CeddusGenius/ArcadeBox)**.
+> Ce dépôt est un fork de [mmatyas/pegasus-frontend](https://github.com/mmatyas/pegasus-frontend) (branche `master` / Qt 5.15) maintenu par **CeddusGenius** dans le cadre du projet **[ArcadeBox](https://github.com/CeddusGenius/ArcadeBox)**.
 >
 > **Modifications apportées :**
-> - Compilation Windows x64 basée sur la branche expérimentale **Qt 6 (`qt6_v2`)** avec support manette **SDL2**.
-> - Correctifs de compilation pour les versions récentes de Qt 6 (`Assets.h` dans `Collection.h` et `Game.h`).
-> - Automatisation des builds Windows via GitHub Actions.
+> - **Adaptation CRT 15 kHz (240p / 288p)** : Refonte de l'interface des paramètres pour un affichage lisible et sans débordement en **384x288 (PAL 50 Hz)**, **320x240 (NTSC 60 Hz)** et en **super-résolutions 15 kHz**.
+> - **Police pixel haute lisibilité** : Intégration d'une police bitmap/pixel nette sans flou d'anticrénelage (`NativeRendering`), avec prise en charge complète des accents français et des langues européennes.
+> - **Compilation Windows x64 (Qt 5.15 + SDL2)** : Automatisation des builds portables et publication dans les Releases via GitHub Actions.
 >
 > Les binaires compilés sont disponibles dans l'onglet **[Releases](../../releases)**. Pour toute demande liée au cœur de Pegasus, merci de vous référer au dépôt officiel.
 
 ---
+
 
 ![screenshot](etc/promo/screenshot_alpha10.jpg)
 
